@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="popup.css" />
+    <title>Leet2Git</title>
+  </head>
+  <body>
+    <header class="header">
+      <div class="brand">
+        <span class="logo">⚡</span>
+        <h1>Leet2Git</h1>
+      </div>
+      <button id="gearBtn" class="icon-btn" title="Settings">⚙️</button>
+    </header>
+
+    <!-- STATS VIEW -->
+    <section id="statsView" class="view hidden">
+      <div class="total-card">
+        <div class="total-num" id="totalNum">0</div>
+        <div class="total-label">Problems Solved</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="diff easy">
+          <span class="diff-num" id="easyNum">0</span>
+          <span class="diff-label">Easy</span>
+        </div>
+        <div class="diff medium">
+          <span class="diff-num" id="medNum">0</span>
+          <span class="diff-label">Medium</span>
+        </div>
+        <div class="diff hard">
+          <span class="diff-num" id="hardNum">0</span>
+          <span class="diff-label">Hard</span>
+        </div>
+      </div>
+
+      <button id="syncBtn" class="btn secondary full">⤓ Sync existing solutions</button>
+      <div id="syncProgress" class="sync-progress hidden"></div>
+
+      <h2 class="section-title">Recent</h2>
+      <ul id="recentList" class="recent-list">
+        <li class="empty">No submissions yet.</li>
+      </ul>
+
+      <div id="statusBar" class="status-bar hidden"></div>
+      <a id="repoLink" class="repo-link hidden" target="_blank" rel="noopener">View repository →</a>
+    </section>
+
+    <!-- SETTINGS VIEW -->
+    <section id="settingsView" class="view hidden">
+      <h2 class="section-title">Setup</h2>
+      <label class="field">
+        <span>GitHub Personal Access Token</span>
+        <input id="pat" type="password" placeholder="ghp_… or github_pat_…" autocomplete="off" />
+        <small>Needs Contents read/write on the target repo. Stored locally only.</small>
+      </label>
+      <label class="field">
+        <span>GitHub Username (owner)</span>
+        <input id="owner" type="text" placeholder="your-username" autocomplete="off" />
+      </label>
+      <label class="field">
+        <span>Repository Name</span>
+        <input id="repo" type="text" placeholder="leetcode-solutions" autocomplete="off" />
+      </label>
+      <label class="field">
+        <span>Branch</span>
+        <input id="branch" type="text" placeholder="main" autocomplete="off" />
+      </label>
+
+      <div class="btn-row">
+        <button id="testBtn" class="btn secondary">Test connection</button>
+        <button id="saveBtn" class="btn primary">Save</button>
+      </div>
+      <div id="settingsMsg" class="settings-msg"></div>
+    </section>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
