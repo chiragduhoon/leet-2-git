@@ -10,6 +10,12 @@
 (function () {
   "use strict";
 
+  if (window.__leet2gitInterceptorLoaded) {
+    console.log("[Leet2Git] interceptor already active (MAIN world)");
+    return;
+  }
+  window.__leet2gitInterceptorLoaded = true;
+
   console.log("[Leet2Git] interceptor active (MAIN world)");
 
   const CHECK_RE = /\/submissions\/detail\/(\d+)\/check\/?/;

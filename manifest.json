@@ -3,7 +3,7 @@
   "name": "Leet2Git",
   "version": "1.0.0",
   "description": "Automatically push your accepted LeetCode solutions to a GitHub repository and track your progress.",
-  "permissions": ["storage"],
+  "permissions": ["storage", "tabs", "scripting"],
   "host_permissions": [
     "https://leetcode.com/*",
     "https://api.github.com/*"

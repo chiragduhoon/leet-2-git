@@ -1,3 +1,10 @@
+(function () {
+if (globalThis.__leet2gitContentLoaded) {
+  console.log("[Leet2Git] content script already ready on", location.href);
+  return;
+}
+globalThis.__leet2gitContentLoaded = true;
+
 // Runs in the ISOLATED world. Two jobs:
 //  1. Receive the "accepted" signal from the MAIN-world interceptor.
 //  2. Fetch the submitted code + problem metadata from LeetCode's GraphQL API.
@@ -124,7 +131,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let syncing = false;
 
 async function setSyncStatus(s) {
-  await chrome.storage.local.set({ syncStatus: s });
+  await chrome.storage.local.set({ syncStatus: { ...s, updatedAt: Date.now() } });
 }
 
 // Push one resolved solution and wait for the background worker to finish it.
@@ -196,6 +203,14 @@ async function fetchAcceptedSubmissions() {
         latestBySlug.set(s.title_slug, String(s.id));
       }
     }
+    await setSyncStatus({
+      running: true,
+      phase: "scanning",
+      note: `Scanned ${offset + dump.length} submissions; found ${latestBySlug.size} accepted problems.`,
+      done: offset + dump.length,
+      total: 0,
+      error: ""
+    });
     if (!data.has_next || dump.length === 0) break;
     offset += limit;
     await sleep(1000); // pace to avoid the rate limit
@@ -205,7 +220,15 @@ async function fetchAcceptedSubmissions() {
 
 async function runSync() {
   console.log("[Leet2Git] sync requested");
-  if (syncing) return;
+  if (syncing) {
+    await setSyncStatus({
+      running: true,
+      phase: "scanning",
+      note: "Sync is already running in this LeetCode tab.",
+      error: ""
+    });
+    return;
+  }
   syncing = true;
   try {
     await setSyncStatus({ running: true, phase: "scanning", done: 0, total: 0, error: "" });
@@ -284,3 +307,4 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   }
   return false;
 });
+})();

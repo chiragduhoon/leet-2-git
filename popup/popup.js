@@ -115,10 +115,30 @@ async function testConnection(s) {
 function renderSync(status) {
   const el = $("syncProgress");
   const btn = $("syncBtn");
+  const staleMs = 2 * 60 * 1000;
   if (!status) {
     el.classList.add("hidden");
     btn.disabled = false;
     btn.textContent = "⤓ Sync existing solutions";
+    return;
+  }
+  if (
+    status.running &&
+    (!status.updatedAt || Date.now() - status.updatedAt > staleMs)
+  ) {
+    el.classList.remove("hidden");
+    el.classList.add("err");
+    el.textContent =
+      "Previous sync stopped responding. Refresh the LeetCode tab, then try again.";
+    btn.disabled = false;
+    btn.textContent = "⤓ Sync existing solutions";
+    chrome.storage.local.set({
+      syncStatus: {
+        ...status,
+        running: false,
+        error: "Previous sync stopped responding."
+      }
+    });
     return;
   }
   if (status.error) {
@@ -155,6 +175,28 @@ function renderSync(status) {
     btn.disabled = false;
     btn.textContent = "⤓ Sync existing solutions";
   }
+}
+
+async function injectLeetCodeScripts(tabId) {
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    files: ["src/interceptor.js"],
+    world: "MAIN"
+  });
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    files: ["src/content.js"],
+    world: "ISOLATED"
+  });
+}
+
+function sendStartSync(tabId) {
+  return new Promise((resolve) => {
+    chrome.tabs.sendMessage(tabId, { type: "START_SYNC" }, (resp) => {
+      const error = chrome.runtime.lastError;
+      resolve({ ok: !error, error: error && error.message, resp });
+    });
+  });
 }
 
 // Reflect current storage state into the UI. Safe to call repeatedly.
@@ -239,7 +281,14 @@ function bindOnce() {
     el.textContent = "Looking for an open LeetCode tab…";
     let tabs = [];
     try {
-      tabs = await chrome.tabs.query({ url: "https://leetcode.com/*" });
+      tabs = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+        url: "https://leetcode.com/*"
+      });
+      if (!tabs.length) {
+        tabs = await chrome.tabs.query({ url: "https://leetcode.com/*" });
+      }
     } catch (_) {
       /* fall through to the no-tab message */
     }
@@ -249,8 +298,22 @@ function bindOnce() {
         "Open leetcode.com in a tab (logged in), then click Sync again.";
       return;
     }
+    try {
+      await injectLeetCodeScripts(tabs[0].id);
+    } catch (e) {
+      el.classList.add("err");
+      el.textContent =
+        "Could not connect to the LeetCode tab. Refresh it, then click Sync again. " +
+        String((e && e.message) || e);
+      return;
+    }
     chrome.tabs.sendMessage(tabs[0].id, { type: "START_SYNC" }, () => {
-      void chrome.runtime.lastError;
+      if (chrome.runtime.lastError) {
+        el.classList.add("err");
+        el.textContent =
+          "Could not reach the LeetCode tab. Refresh it, then click Sync again.";
+        $("syncBtn").disabled = false;
+      }
     });
     $("syncBtn").disabled = true;
     el.textContent = "Sync started — keep that LeetCode tab open.";
