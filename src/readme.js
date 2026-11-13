@@ -65,7 +65,7 @@ export function buildRootReadme(stats) {
   return [
     "# LeetCode Solutions",
     "",
-    "Automatically synced from LeetCode by [Leet2Git](https://github.com).",
+    "Automatically synced from LeetCode by [Leet2Git](https://github.com/chiragduhoon/leet-2-git).",
     "",
     `**Total solved:** ${total} &nbsp;·&nbsp; 🟢 Easy: ${counts.Easy || 0} &nbsp;·&nbsp; 🟡 Medium: ${
       counts.Medium || 0

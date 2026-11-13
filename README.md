@@ -3,6 +3,12 @@
 A Chrome extension that **automatically pushes every accepted LeetCode solution to a GitHub
 repository** and tracks your progress (total solved + Easy/Medium/Hard counts + recent submissions).
 
+| Extension popup | What it maintains for you |
+|---|---|
+| ![Leet2Git popup: GitHub token, owner, repository and branch](docs/popup.png) | ![Auto-generated solutions repo: 125 solved, 59 easy, 60 medium, 6 hard, linked per problem](docs/synced-repo.png) |
+
+The right-hand image is my own [leetcode-solutions](https://github.com/chiragduhoon/leetcode-solutions) repository, kept up to date entirely by Leet2Git.
+
 Each accepted submission is committed as a folder per problem:
 
 ```
